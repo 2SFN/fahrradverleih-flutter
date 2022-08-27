@@ -1,6 +1,12 @@
+import 'package:fahrradverleih/api/remote/remote_rad_api.dart';
+import 'package:fahrradverleih/util/prefs.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+Future<void> main() async {
+  await Prefs.instance.init();
+  await RemoteRadApi.instance
+      .init(Prefs.instance.getOrDefault(Prefs.keyToken, ""));
+
   runApp(const MyApp());
 }
 
