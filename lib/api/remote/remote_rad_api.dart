@@ -27,7 +27,7 @@ class RemoteRadApi extends RadApi {
   /// Initialisiert die API-Instanz.
   /// Sollte vor der Verwendung und nach Veränderung des Tokens in
   /// den [Prefs] aufgerufen werden.
-  init(String token) async {
+  Future<void> init(String token) async {
     _token = token;
   }
 

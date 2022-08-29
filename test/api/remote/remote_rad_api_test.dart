@@ -3,20 +3,20 @@ import 'package:flutter_test/flutter_test.dart';
 
 /// Testet die Bereitschaft und einige Methoden der Remote-API.
 void main() {
-  const _testing_token = "Test";
+  const _testingToken = "Test";
 
   test("Instanz wird korrekt initialisiert", () async {
-    await RemoteRadApi.instance.init(_testing_token);
+    await RemoteRadApi.instance.init(_testingToken);
   });
 
-  test("Login-Methode", () async {
-    await RemoteRadApi.instance.init(_testing_token);
+  test("Benutzer: Login", () async {
+    await RemoteRadApi.instance.init(_testingToken);
     await RemoteRadApi.instance.login(
         email: "u3@test.mail", secret: "Test");
   });
 
-  test("Get Stationen", () async {
-    await RemoteRadApi.instance.init(_testing_token);
+  test("Stationen: Liste", () async {
+    await RemoteRadApi.instance.init(_testingToken);
     await RemoteRadApi.instance.getStationen();
   });
 }
