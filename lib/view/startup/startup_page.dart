@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Container, welcher den Hintergrund und die AppBar konfiguriert.
+///
 /// Stellt außerdem eine [RadApi]-Instanz bereit, welche durch die Verwendung
 /// des [BlockProvider] in untergeordneten Widgets weiterverwendet werden kann.
 class StartupPage extends StatelessWidget {
@@ -42,7 +43,8 @@ class StartupPage extends StatelessWidget {
   /// Entscheidet, ob beim Interagieren mit der "Zurück"-Taste oder -Geste
   /// der BLoC auf das Event reagieren soll (```false```), oder das
   /// Standard-Verhalten ausgelöst wird (```true```).
-  Future<bool> _handleBackEvent(BuildContext context, StartupState state) async {
+  Future<bool> _handleBackEvent(
+      BuildContext context, StartupState state) async {
     switch (state.content) {
       case StartupContent.welcome:
       case StartupContent.authentication:

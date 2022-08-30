@@ -17,9 +17,14 @@ enum StartupContent {
 }
 
 /// Beschreibt den Zustand der Authentifizierung.
+///
 /// Zutreffend bei den Inhalten [StartupContent.authentication],
 /// [StartupContent.login] und [StartupContent.register].
-enum AuthenticationStatus { idle, authenticating, failed }
+///
+/// Wird der [AuthenticationStatus.authenticated]-Zustand erreicht, ist
+/// jegliche Interaktion für die [StartupPage] abgeschlossen und es kann
+/// zur nächsten Ansicht navigiert werden.
+enum AuthenticationStatus { idle, authenticating, failed, authenticated }
 
 class StartupState extends Equatable {
   const StartupState(

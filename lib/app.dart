@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Anwendungsklasse.
+///
 /// Stellt dem untergeordnetem Baum Repositories (wie [RadApi]) zur
 /// Verfügung.
 class App extends StatelessWidget {

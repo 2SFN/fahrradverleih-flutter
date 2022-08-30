@@ -76,13 +76,14 @@ class StartupBloc extends Bloc<StartupEvent, StartupState> {
 
   /// Reagiert auf Interaktion mit dem Zurück-Button/-Geste.
   _onBackPressed(BackPressed event, Emitter<StartupState> emit) {
-    if(state.authenticationStatus != AuthenticationStatus.authenticating) {
+    if (state.authenticationStatus != AuthenticationStatus.authenticating) {
       add(const StartupNavigationEvent(StartupContent.welcome));
     }
   }
 
   /// Stellt sicher, dass das gespeicherte Token (falls vorhanden) von der
   /// API akzeptiert wird.
+  ///
   /// Ist dies nicht der Fall (entweder es liegt noch kein Token vor, oder es
   /// ist z.B. abgelaufen), dann wird zum [StartupContent.welcome]-Inhalt
   /// gewechselt, und der Anwender kann sich neu authentifizieren.
@@ -94,7 +95,8 @@ class StartupBloc extends Bloc<StartupEvent, StartupState> {
     try {
       await Future.delayed(const Duration(seconds: 1));
       await _api.auth();
-      // TODO: Success! Navigate away...
+      emit(state.copyWith(
+          authenticationStatus: AuthenticationStatus.authenticated));
     } catch (e) {
       emit(state.copyWith(content: StartupContent.welcome));
       add(AuthenticationFailed("Authentifizierung fehlgeschlagen: $e\n\n"
@@ -111,6 +113,7 @@ class StartupBloc extends Bloc<StartupEvent, StartupState> {
   }
 
   /// Fragt bei der API mit den eingegebenen Login-Daten eine neue Session an.
+  ///
   /// Ist die Anfrage erfolgreich, wird das Token gespeichert, angewendet,
   /// und anschließend wird wieder zum [StartupContent.authentication]-Inhalt
   /// gewechselt.
@@ -140,6 +143,7 @@ class StartupBloc extends Bloc<StartupEvent, StartupState> {
   }
 
   /// Setzt bei fehlgeschlagener Authentifizierung den Status zurück.
+  ///
   /// Weitere Maßnahmen, wie das Anzeigen einer entsprechenden
   /// Fehlermeldung, können vom Presentation-Layer ausgeführt werden.
   _onAuthenticationFailed(
