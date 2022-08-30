@@ -20,6 +20,10 @@ class StartupNavigationEvent extends StartupEvent {
   List<Object?> get props => [content];
 }
 
+class BackPressed extends StartupEvent {
+  const BackPressed();
+}
+
 class LoginEmailChanged extends StartupEvent {
   const LoginEmailChanged(this.email);
 

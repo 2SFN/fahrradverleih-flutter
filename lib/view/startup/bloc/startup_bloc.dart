@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:equatable/equatable.dart';
 import 'package:fahrradverleih/api/rad_api.dart';
 import 'package:fahrradverleih/api/remote/remote_rad_api.dart';
@@ -20,6 +22,7 @@ class StartupBloc extends Bloc<StartupEvent, StartupState> {
     // Event-Listeners
     on<AppStarted>(_onAppStart);
     on<StartupNavigationEvent>(_onNavigationEvent);
+    on<BackPressed>(_onBackPressed);
     on<LoginEmailChanged>(_onEmailChanged);
     on<LoginPasswordChanged>(_onPasswordChanged);
     on<LoginSubmitted>(_onLoginSubmitted);
@@ -68,6 +71,13 @@ class StartupBloc extends Bloc<StartupEvent, StartupState> {
             email: "",
             password: ""));
         break;
+    }
+  }
+
+  /// Reagiert auf Interaktion mit dem Zurück-Button/-Geste.
+  _onBackPressed(BackPressed event, Emitter<StartupState> emit) {
+    if(state.authenticationStatus != AuthenticationStatus.authenticating) {
+      add(const StartupNavigationEvent(StartupContent.welcome));
     }
   }
 

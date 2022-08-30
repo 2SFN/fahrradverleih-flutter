@@ -17,19 +17,41 @@ class StartupPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(title: const Text("Fahrradverleih")),
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: BlocProvider(
-              create: (context) =>
-                  StartupBloc(api: RepositoryProvider.of<RadApi>(context))
-                      .appStarted(),
-              child: const StartupContentView(),
+    return BlocProvider(
+        create: (context) =>
+            StartupBloc(api: RepositoryProvider.of<RadApi>(context))
+                .appStarted(),
+        child: BlocBuilder<StartupBloc, StartupState>(
+          // WillPopScope fängt die "Zurück"-Taste/-Geste ab, und erlaubt es
+          // das Standard-Verhalten zu unterdrücken
+          builder: (context, state) => WillPopScope(
+            onWillPop: () => _handleBackEvent(context, state),
+            child: Scaffold(
+              appBar: AppBar(title: const Text("Fahrradverleih")),
+              body: const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: StartupContentView(),
+                ),
+              ),
             ),
           ),
         ));
+  }
+
+  /// Entscheidet, ob beim Interagieren mit der "Zurück"-Taste oder -Geste
+  /// der BLoC auf das Event reagieren soll (```false```), oder das
+  /// Standard-Verhalten ausgelöst wird (```true```).
+  Future<bool> _handleBackEvent(BuildContext context, StartupState state) async {
+    switch (state.content) {
+      case StartupContent.welcome:
+      case StartupContent.authentication:
+        return true;
+      case StartupContent.login:
+      case StartupContent.register:
+        context.read<StartupBloc>().add(const BackPressed());
+        return false;
+    }
   }
 }
 
@@ -41,7 +63,7 @@ class StartupContentView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<StartupBloc, StartupState>(
-      // buildWhen: (previous, current) => previous.content != current.content,
+      buildWhen: (previous, current) => previous.content != current.content,
       builder: (context, state) {
         switch (state.content) {
           case StartupContent.authentication:

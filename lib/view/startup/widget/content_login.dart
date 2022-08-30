@@ -21,20 +21,9 @@ class ContentLogin extends StatelessWidget {
           _EmailInput(),
           _PasswordInput(),
           _LoginButton(),
-          _DebugBloc()
         ],
       ),
     );
-  }
-}
-
-class _DebugBloc extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<StartupBloc, StartupState>(
-        builder: (context, state) => Text(
-            "Screen: ${state.content}\nAuth: ${state.authenticationStatus}\n"
-            "Email: ${state.email}\nPass: ${state.password}"));
   }
 }
 
