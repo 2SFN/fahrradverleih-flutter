@@ -1,6 +1,9 @@
 import 'package:equatable/equatable.dart';
 
 class Benutzer extends Equatable {
+  static const Benutzer empty =
+      Benutzer(id: "", name: "", vorname: "", email: "");
+
   final String id;
   final String name;
   final String vorname;

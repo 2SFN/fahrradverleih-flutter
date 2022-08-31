@@ -53,6 +53,10 @@ class RemoteRadApi extends RadApi {
       Benutzer.fromJson(await get("/benutzer/details"));
 
   @override
+  Future<Benutzer> setBenutzer({required Benutzer benutzer}) async =>
+      Benutzer.fromJson(await post("/benutzer/details", benutzer.toJson()));
+
+  @override
   Future<List<Fahrrad>> getRaeder({required String stationId}) async =>
       _processList(await get("/stationen/$stationId/raeder"),
           (e) => Fahrrad.fromJson(e));
@@ -77,10 +81,6 @@ class RemoteRadApi extends RadApi {
         "von": von.toIso8601String(),
         "bis": bis.toIso8601String()
       }));
-
-  @override
-  Future<Benutzer> setBenutzer({required Benutzer benutzer}) async =>
-      Benutzer.fromJson(await post("/benutzer/details", benutzer.toJson()));
 
   // --- Utility für HTTP-Requests
 
