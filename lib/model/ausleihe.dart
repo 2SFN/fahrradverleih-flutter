@@ -16,6 +16,12 @@ class Ausleihe extends Equatable {
       required this.von,
       required this.bis});
 
+  /// Gibt die Dauer der Ausleihe in vollen Stunden zurück.
+  int get dauer => bis.difference(von).inHours;
+
+  /// Ist die Ausleihe aktiv (muss zurückgegeben werden)?
+  bool get aktiv => DateTime.now().isBefore(bis);
+
   @override
   List<Object?> get props => [id, fahrrad, tarif, von, bis];
 

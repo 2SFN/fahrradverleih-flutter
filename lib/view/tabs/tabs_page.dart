@@ -1,3 +1,4 @@
+import 'package:fahrradverleih/view/ausleihen/ausleihen_page.dart';
 import 'package:fahrradverleih/view/profil/profil_page.dart';
 import 'package:fahrradverleih/view/tabs/bloc/tabs_bloc.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +30,7 @@ class _TabsView extends StatelessWidget {
                   index: state.tab.index,
                   children: const [
                     Center(child: Text("Map Placeholder")), // TODO
-                    Center(child: Text("Ausleihen Placeholder")), // TODO
+                    AusleihenPage(),
                     ProfilPage(),
                   ],
                 ),
