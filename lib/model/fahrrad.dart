@@ -3,6 +3,9 @@ import 'package:fahrradverleih/model/fahrradtyp.dart';
 import 'package:fahrradverleih/model/geoposition.dart';
 
 class Fahrrad extends Equatable {
+  static const Fahrrad empty =
+      Fahrrad(id: "", position: GeopositionT.empty, typ: FahrradTyp.empty);
+
   final String id;
   final GeopositionT position;
   final FahrradTyp typ;

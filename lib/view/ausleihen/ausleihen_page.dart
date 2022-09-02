@@ -1,5 +1,6 @@
 import 'package:fahrradverleih/api/rad_api.dart';
 import 'package:fahrradverleih/model/ausleihe.dart';
+import 'package:fahrradverleih/view/ausleihe_beenden/ausleihe_beenden_page.dart';
 import 'package:fahrradverleih/view/ausleihen/bloc/ausleihen_bloc.dart';
 import 'package:fahrradverleih/view/ausleihen/widget/ausleihe_item.dart';
 import 'package:flutter/material.dart';
@@ -22,21 +23,38 @@ class AusleihenPage extends StatelessWidget {
 class _AusleihenView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(title: const Text("Meine Ausleihen")),
-        body: BlocBuilder<AusleihenBloc, AusleihenState>(
-            buildWhen: (previous, current) =>
-                previous.jobState != current.jobState,
-            builder: (context, state) {
-              switch (state.jobState) {
-                case JobState.fetching:
-                  return const Center(child: CircularProgressIndicator());
-                case JobState.failed:
-                  return _RetryPanel();
-                case JobState.idle:
-                  return _AusleihenList();
-              }
-            }));
+    return BlocConsumer<AusleihenBloc, AusleihenState>(
+        buildWhen: (p, c) => p.jobState != c.jobState,
+        builder: (context, state) => Scaffold(
+            appBar: AppBar(title: const Text("Meine Ausleihen")),
+            body: _getWidget(context, state)),
+        listenWhen: (p, c) => c.jobState == JobState.rueckgabe,
+        listener: (p, c) {
+          _handleNavigationEvent(context, c);
+        });
+  }
+
+  _handleNavigationEvent(BuildContext context, AusleihenState state) async {
+    if (state.jobState == JobState.rueckgabe && state.auswahl != null) {
+      // Öffnet [AusleiheBeendenPage] mit der ausgewählten Ausleihe als
+      // Argument, und emittiert ein Event, sobald der Anwender zurückkehrt
+      final bloc = context.read<AusleihenBloc>();
+      var result = await Navigator.of(context)
+          .push(AusleiheBeendenPage.route(state.auswahl!));
+      bloc.add(RueckgabeAbgeschlossen(result));
+    }
+  }
+
+  _getWidget(BuildContext context, AusleihenState state) {
+    switch (state.jobState) {
+      case JobState.fetching:
+        return const Center(child: CircularProgressIndicator());
+      case JobState.failed:
+        return _RetryPanel();
+      case JobState.idle:
+      case JobState.rueckgabe:
+        return _AusleihenList();
+    }
   }
 }
 
@@ -48,6 +66,7 @@ class _AusleihenList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AusleihenBloc, AusleihenState>(
+        buildWhen: (c, p) => c.ausleihen != p.ausleihen,
         builder: (context, state) => RefreshIndicator(
               triggerMode: RefreshIndicatorTriggerMode.onEdge,
               onRefresh: () async {
@@ -69,16 +88,18 @@ class _AusleihenList extends StatelessWidget {
             ));
   }
 
+  /// Baut das Listen-Item an einem bestimmten [index].
+  ///
+  /// Regulär wird die [AusleiheItem]-Klasse verwendet. An der letzten Position
+  /// wird allerdings ein "End-of-List" Label generiert.
   Widget _buildItem(BuildContext context, int index, List<Ausleihe> ausleihen) {
     if (index == ausleihen.length) {
-      // Letztes Item ist immer End-of-List Label
       return const Center(
           child: Padding(
         padding: EdgeInsets.all(16),
         child: Text("Keine weiteren Elemente"),
       ));
     } else {
-      // Normales item
       final Ausleihe ausleihe = ausleihen[index];
       return AusleiheItem(
           ausleihe: ausleihe,

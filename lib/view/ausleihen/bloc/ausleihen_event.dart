@@ -23,3 +23,12 @@ class AusleiheSelected extends AusleihenEvent {
   @override
   List<Object?> get props => [ausleihe];
 }
+
+class RueckgabeAbgeschlossen extends AusleihenEvent {
+  const RueckgabeAbgeschlossen(this.ausleihe);
+
+  final Ausleihe? ausleihe;
+
+  @override
+  List<Object?> get props => [ausleihe];
+}

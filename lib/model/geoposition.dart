@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 
 class GeopositionT extends Equatable {
+  static const GeopositionT empty = GeopositionT(breite: 0, laenge: 0);
+
   final double breite;
   final double laenge;
 

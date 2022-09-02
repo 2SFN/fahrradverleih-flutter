@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:fahrradverleih/api/rad_api.dart';
@@ -14,22 +16,40 @@ class AusleihenBloc extends Bloc<AusleihenEvent, AusleihenState> {
     on<FirstConstructed>(_onFirstConstructed);
     on<ReloadRequested>(_onReloadRequested);
     on<AusleiheSelected>(_onAusleiheSelected);
+    on<RueckgabeAbgeschlossen>(_onRueckgabeAbgeschlossen);
   }
 
   final RadApi _api;
 
-  _onFirstConstructed(FirstConstructed event,
-      Emitter<AusleihenState> emit) async {
+  _onFirstConstructed(
+      FirstConstructed event, Emitter<AusleihenState> emit) async {
     await _fetchData(emit);
   }
 
-  _onReloadRequested(ReloadRequested event,
-      Emitter<AusleihenState> emit) async {
+  _onReloadRequested(
+      ReloadRequested event, Emitter<AusleihenState> emit) async {
     await _fetchData(emit);
   }
 
   _onAusleiheSelected(AusleiheSelected event, Emitter<AusleihenState> emit) {
-    // TODO: Impl.
+    emit(state.copyWith(jobState: JobState.rueckgabe, auswahl: event.ausleihe));
+  }
+
+  _onRueckgabeAbgeschlossen(
+      RueckgabeAbgeschlossen event, Emitter<AusleihenState> emit) {
+    // Ausleihe aktualisieren, falls sich etwas geändert hat
+    if (event.ausleihe != null) {
+      var ausleihen = List<Ausleihe>.from(state.ausleihen);
+      var index = ausleihen.indexWhere((a) => a.id == event.ausleihe!.id);
+      if (index >= 0) {
+        ausleihen[index] = event.ausleihe!;
+      }
+
+      emit(state.copyWith(
+          jobState: JobState.idle, ausleihen: ausleihen, auswahl: null));
+    } else {
+      emit(state.copyWith(jobState: JobState.idle, auswahl: null));
+    }
   }
 
   _fetchData(Emitter<AusleihenState> emit) async {

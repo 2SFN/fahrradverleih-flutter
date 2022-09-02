@@ -2,6 +2,9 @@ import 'package:equatable/equatable.dart';
 import 'package:fahrradverleih/model/tarif.dart';
 
 class FahrradTyp extends Equatable {
+  static const FahrradTyp empty =
+      FahrradTyp(bezeichnung: "", tarif: TarifT.empty);
+
   final String bezeichnung;
   final TarifT tarif;
 
