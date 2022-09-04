@@ -10,6 +10,9 @@ local.properties
 .history
 .svn/
 
+# DotEnv
+.env
+
 # IntelliJ related
 *.iml
 *.ipr

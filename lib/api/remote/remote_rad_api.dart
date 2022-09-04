@@ -7,6 +7,7 @@ import 'package:fahrradverleih/model/fahrrad.dart';
 import 'package:fahrradverleih/model/login_result.dart';
 import 'package:fahrradverleih/model/station.dart';
 import 'package:fahrradverleih/util/prefs.dart';
+import 'package:flutter_config/flutter_config.dart';
 import 'package:http/http.dart' as http;
 
 /// Implementierung der Rad-API, welche die Daten von dem REST-Backend
@@ -21,7 +22,7 @@ class RemoteRadApi extends RadApi {
   RemoteRadApi._internal();
 
   // TODO: Base-URL aus .env lesen
-  final String _baseUrl = "http://10.0.0.50:3000/api";
+  final String _baseUrl = FlutterConfig.get("RAD_API_URL");
   String _token = "";
 
   /// Initialisiert die API-Instanz.
