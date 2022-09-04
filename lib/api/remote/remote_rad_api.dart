@@ -21,7 +21,6 @@ class RemoteRadApi extends RadApi {
 
   RemoteRadApi._internal();
 
-  // TODO: Base-URL aus .env lesen
   final String _baseUrl = FlutterConfig.get("RAD_API_URL");
   String _token = "";
 
