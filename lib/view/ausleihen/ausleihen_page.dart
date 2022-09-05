@@ -4,6 +4,7 @@ import 'package:fahrradverleih/view/ausleihe_beenden/ausleihe_beenden_page.dart'
 import 'package:fahrradverleih/view/ausleihen/bloc/ausleihen_bloc.dart';
 import 'package:fahrradverleih/view/ausleihen/widget/ausleihe_item.dart';
 import 'package:fahrradverleih/widget/end_of_list_item.dart';
+import 'package:fahrradverleih/widget/error_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -51,12 +52,16 @@ class _AusleihenView extends StatelessWidget {
       case JobState.fetching:
         return const Center(child: CircularProgressIndicator());
       case JobState.failed:
-        return _RetryPanel();
+        return _getRetryPanel(context);
       case JobState.idle:
       case JobState.rueckgabe:
         return _AusleihenList();
     }
   }
+
+  _getRetryPanel(BuildContext context) => ErrorPanel(
+    onRetry: () => context.read<AusleihenBloc>().add(const ReloadRequested()),
+  );
 }
 
 /// Widget, welches eine Liste von Ausleihen anzeigt.
@@ -104,24 +109,5 @@ class _AusleihenList extends StatelessWidget {
             context.read<AusleihenBloc>().add(AusleiheSelected(ausleihe));
           });
     }
-  }
-}
-
-class _RetryPanel extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-        child: Column(children: [
-      const Icon(
-        Icons.error,
-        size: 48,
-        semanticLabel: "Fehler",
-      ),
-      TextButton(
-          onPressed: () {
-            context.read<AusleihenBloc>().add(const ReloadRequested());
-          },
-          child: const Text("Neu Laden"))
-    ]));
   }
 }

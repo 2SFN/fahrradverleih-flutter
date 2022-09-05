@@ -2,6 +2,7 @@ import 'package:fahrradverleih/api/rad_api.dart';
 import 'package:fahrradverleih/model/ausleihe.dart';
 import 'package:fahrradverleih/model/station.dart';
 import 'package:fahrradverleih/view/ausleihe_beenden/bloc/ausleihe_beenden_bloc.dart';
+import 'package:fahrradverleih/widget/error_panel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -54,7 +55,7 @@ class _AusleiheBeendenView extends StatelessWidget {
             case AusleiheBeendenStatus.idle:
               return _StationAuswahlPanel();
             case AusleiheBeendenStatus.failed:
-              return _RetryPanel();
+              return _getRetryPanel(context);
           }
         },
         listenWhen: (previous, current) => previous.status != current.status,
@@ -68,6 +69,11 @@ class _AusleiheBeendenView extends StatelessWidget {
       Navigator.pop(context, null);
     }
   }
+
+  _getRetryPanel(BuildContext context) => ErrorPanel(
+    onRetry: () => context.read<AusleiheBeendenBloc>()
+        .add(const RetryRequested()),
+  );
 }
 
 class _StationAuswahlPanel extends StatelessWidget {
@@ -137,25 +143,5 @@ class _CancelButton extends StatelessWidget {
             onPressed: () {
               bloc.add(const AusleiheBeendenCancelled());
             }));
-  }
-}
-
-class _RetryPanel extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final bloc = context.read<AusleiheBeendenBloc>();
-    return Center(
-        child: Column(children: [
-      const Icon(
-        Icons.error,
-        size: 48,
-        semanticLabel: "Fehler",
-      ),
-      TextButton(
-          onPressed: () {
-            bloc.add(const RetryRequested());
-          },
-          child: const Text("Neu Laden"))
-    ]));
   }
 }

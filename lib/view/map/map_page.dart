@@ -1,5 +1,6 @@
 import 'package:fahrradverleih/api/rad_api.dart';
 import 'package:fahrradverleih/view/rad_auswahl/rad_auswahl_page.dart';
+import 'package:fahrradverleih/widget/error_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -37,10 +38,10 @@ class _ContentView extends StatelessWidget {
   }
 
   _handleNavigationEvent(BuildContext context, MapState state) async {
-    if(state.status == MapStatus.radAuswahl && state.auswahlStation != null) {
+    if (state.status == MapStatus.radAuswahl && state.auswahlStation != null) {
       final bloc = context.read<MapBloc>();
-      var rad = await Navigator.of(context).push(
-          RadAuswahlPage.route(state.auswahlStation!));
+      var rad = await Navigator.of(context)
+          .push(RadAuswahlPage.route(state.auswahlStation!));
       bloc.add(RadSelected(rad));
     }
   }
@@ -50,13 +51,16 @@ class _ContentView extends StatelessWidget {
       case MapStatus.fetching:
         return const Center(child: CircularProgressIndicator());
       case MapStatus.failure:
-        return _RetryPanel();
+        return _getRetryPanel(context);
       case MapStatus.idle:
       case MapStatus.buchung:
       case MapStatus.radAuswahl:
         return _MapView();
     }
   }
+
+  _getRetryPanel(BuildContext context) => ErrorPanel(
+      onRetry: () => context.read<MapBloc>().add(const RetryRequested()));
 }
 
 class _MapView extends StatelessWidget {
@@ -65,8 +69,8 @@ class _MapView extends StatelessWidget {
     // TODO: Map-marker style and labels
     return BlocBuilder<MapBloc, MapState>(
       builder: (context, state) => GoogleMap(
-        initialCameraPosition:
-            const CameraPosition(target: LatLng(51.102129, 6.892598), zoom: 13.7),
+        initialCameraPosition: const CameraPosition(
+            target: LatLng(51.102129, 6.892598), zoom: 13.7),
         minMaxZoomPreference: const MinMaxZoomPreference(10, 20),
         tiltGesturesEnabled: false,
         markers: _buildMarkers(context, state.stationen),
@@ -78,32 +82,12 @@ class _MapView extends StatelessWidget {
     return Set.from(List.generate(stationen.length, (index) {
       var s = stationen[index];
       return Marker(
-        markerId: MarkerId(s.id),
-        position: LatLng(s.position.breite, s.position.laenge),
-        consumeTapEvents: true,
-        onTap: () {
-          context.read<MapBloc>().add(StationSelected(s));
-        }
-    );
+          markerId: MarkerId(s.id),
+          position: LatLng(s.position.breite, s.position.laenge),
+          consumeTapEvents: true,
+          onTap: () {
+            context.read<MapBloc>().add(StationSelected(s));
+          });
     }));
-  }
-}
-
-class _RetryPanel extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-        child: Column(children: [
-      const Icon(
-        Icons.error,
-        size: 48,
-        semanticLabel: "Fehler",
-      ),
-      TextButton(
-          onPressed: () {
-            context.read<MapBloc>().add(const RetryRequested());
-          },
-          child: const Text("Neu Laden"))
-    ]));
   }
 }
