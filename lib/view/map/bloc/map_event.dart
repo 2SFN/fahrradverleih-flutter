@@ -20,6 +20,15 @@ class StationSelected extends MapEvent {
   List<Object?> get props => [auswahl];
 }
 
+class RadSelected extends MapEvent {
+  const RadSelected(this.auswahl);
+
+  final Fahrrad? auswahl;
+
+  @override
+  List<Object?> get props => [auswahl];
+}
+
 class BuchungAbgeschlossen extends MapEvent {
   const BuchungAbgeschlossen();
 }

@@ -1,4 +1,5 @@
 import 'package:fahrradverleih/api/rad_api.dart';
+import 'package:fahrradverleih/view/rad_auswahl/rad_auswahl_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -35,8 +36,13 @@ class _ContentView extends StatelessWidget {
     );
   }
 
-  _handleNavigationEvent(BuildContext context, MapState state) {
-    // TODO: Impl.
+  _handleNavigationEvent(BuildContext context, MapState state) async {
+    if(state.status == MapStatus.radAuswahl && state.auswahlStation != null) {
+      final bloc = context.read<MapBloc>();
+      var rad = await Navigator.of(context).push(
+          RadAuswahlPage.route(state.auswahlStation!));
+      bloc.add(RadSelected(rad));
+    }
   }
 
   _getWidget(BuildContext context, MapState state) {
@@ -46,7 +52,8 @@ class _ContentView extends StatelessWidget {
       case MapStatus.failure:
         return _RetryPanel();
       case MapStatus.idle:
-      case MapStatus.ausleihe:
+      case MapStatus.buchung:
+      case MapStatus.radAuswahl:
         return _MapView();
     }
   }
@@ -59,7 +66,7 @@ class _MapView extends StatelessWidget {
     return BlocBuilder<MapBloc, MapState>(
       builder: (context, state) => GoogleMap(
         initialCameraPosition:
-            const CameraPosition(target: LatLng(51.102129, 6.892598), zoom: 14),
+            const CameraPosition(target: LatLng(51.102129, 6.892598), zoom: 13.7),
         minMaxZoomPreference: const MinMaxZoomPreference(10, 20),
         tiltGesturesEnabled: false,
         markers: _buildMarkers(context, state.stationen),

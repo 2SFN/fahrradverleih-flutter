@@ -1,30 +1,34 @@
 part of 'map_bloc.dart';
 
-enum MapStatus { fetching, failure, idle, ausleihe }
+enum MapStatus { fetching, failure, idle, radAuswahl, buchung }
 
 class MapState extends Equatable {
   const MapState({
     this.status = MapStatus.fetching,
     this.stationen = const [],
-    this.auswahl,
+    this.auswahlStation,
+    this.auswahlRad
   });
 
   final MapStatus status;
   final List<Station> stationen;
-  final Station? auswahl;
+  final Station? auswahlStation;
+  final Fahrrad? auswahlRad;
 
   @override
-  List<Object?> get props => [status, stationen, auswahl];
+  List<Object?> get props => [status, stationen, auswahlStation];
 
   MapState copyWith({
     MapStatus? status,
     List<Station>? stationen,
-    Station? auswahl,
+    Station? auswahlStation,
+    Fahrrad? auswahlRad,
   }) {
     return MapState(
       status: status ?? this.status,
       stationen: stationen ?? this.stationen,
-      auswahl: auswahl ?? this.auswahl,
+      auswahlStation: auswahlStation ?? this.auswahlStation,
+      auswahlRad: auswahlRad ?? this.auswahlRad,
     );
   }
 }

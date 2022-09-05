@@ -2,6 +2,9 @@ import 'package:equatable/equatable.dart';
 import 'package:fahrradverleih/model/geoposition.dart';
 
 class Station extends Equatable {
+  static const Station empty = Station(
+      id: "", bezeichnung: "", position: GeopositionT.empty, verfuegbar: 0);
+
   final String id;
   final String bezeichnung;
   final GeopositionT position;
