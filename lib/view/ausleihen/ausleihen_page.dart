@@ -3,6 +3,7 @@ import 'package:fahrradverleih/model/ausleihe.dart';
 import 'package:fahrradverleih/view/ausleihe_beenden/ausleihe_beenden_page.dart';
 import 'package:fahrradverleih/view/ausleihen/bloc/ausleihen_bloc.dart';
 import 'package:fahrradverleih/view/ausleihen/widget/ausleihe_item.dart';
+import 'package:fahrradverleih/widget/end_of_list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -94,11 +95,7 @@ class _AusleihenList extends StatelessWidget {
   /// wird allerdings ein "End-of-List" Label generiert.
   Widget _buildItem(BuildContext context, int index, List<Ausleihe> ausleihen) {
     if (index == ausleihen.length) {
-      return const Center(
-          child: Padding(
-        padding: EdgeInsets.all(16),
-        child: Text("Keine weiteren Elemente"),
-      ));
+      return const EndOfListItem();
     } else {
       final Ausleihe ausleihe = ausleihen[index];
       return AusleiheItem(
