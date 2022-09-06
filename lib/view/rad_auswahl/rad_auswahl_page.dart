@@ -1,6 +1,5 @@
 import 'package:fahrradverleih/api/rad_api.dart';
 import 'package:fahrradverleih/model/fahrrad.dart';
-import 'package:fahrradverleih/model/fahrradtyp.dart';
 import 'package:fahrradverleih/model/station.dart';
 import 'package:fahrradverleih/model/tarif.dart';
 import 'package:fahrradverleih/view/ausleihe_beenden/ausleihe_beenden_page.dart';
@@ -8,6 +7,7 @@ import 'package:fahrradverleih/view/rad_auswahl/bloc/rad_auswahl_bloc.dart';
 import 'package:fahrradverleih/view/rad_auswahl/model/rad_kategorie.dart';
 import 'package:fahrradverleih/widget/end_of_list_item.dart';
 import 'package:fahrradverleih/widget/error_panel.dart';
+import 'package:fahrradverleih/widget/rad_item_base.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -118,7 +118,7 @@ class _TypAuswahlPanel extends StatelessWidget {
     }
 
     final RadKategorie kategorie = typen[index];
-    return _RadItemBase(
+    return RadItemBase(
       typ: kategorie.typ,
       extensions: [
         Text("Verfügbar: ${kategorie.verfuegbar}"),
@@ -153,7 +153,7 @@ class _RadAuswahlPanel extends StatelessWidget {
     }
 
     final Fahrrad rad = raeder[index];
-    return _RadItemBase(
+    return RadItemBase(
       typ: rad.typ,
       extensions: [
         Text(_tarifInfo(rad.typ.tarif)),
@@ -171,28 +171,5 @@ class _RadAuswahlPanel extends StatelessWidget {
   String _tarifInfo(TarifT t) {
     return "Tarif: ${t.preis.iso4217} ${t.preis.betrag} "
         "für ${t.taktung} Stunde(n)";
-  }
-}
-
-/// Erweiterbares List-Item, das Informationen zu einem Rad oder Rad-Typen
-/// anzeigt.
-class _RadItemBase extends StatelessWidget {
-  const _RadItemBase({
-    required this.typ,
-    this.extensions = const [],
-  });
-
-  final FahrradTyp typ;
-  final List<Widget> extensions;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-        padding: const EdgeInsets.all(8),
-        child: Row(children: [
-          Icon(Icons.pedal_bike_outlined,
-              size: 64, semanticLabel: typ.bezeichnung),
-          Column(children: [Text(typ.bezeichnung), ...extensions])
-        ]));
   }
 }
