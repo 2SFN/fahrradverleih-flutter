@@ -30,7 +30,12 @@ class RadSelected extends MapEvent {
 }
 
 class BuchungAbgeschlossen extends MapEvent {
-  const BuchungAbgeschlossen();
+  const BuchungAbgeschlossen(this.ausleihe);
+
+  final Ausleihe? ausleihe;
+
+  @override
+  List<Object?> get props => [ausleihe];
 }
 
 class RetryRequested extends MapEvent {

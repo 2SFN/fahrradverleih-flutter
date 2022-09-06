@@ -1,6 +1,6 @@
 part of 'map_bloc.dart';
 
-enum MapStatus { fetching, failure, idle, radAuswahl, buchung }
+enum MapStatus { fetching, failure, idle, radAuswahl, buchung, buchungOk }
 
 class MapState extends Equatable {
   const MapState({

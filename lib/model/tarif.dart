@@ -5,7 +5,7 @@ class TarifT extends Equatable {
   static const empty = TarifT(preis: CurrencyT.zero, taktung: 1);
 
   final CurrencyT preis;
-  final num taktung;
+  final int taktung;
 
   const TarifT({required this.preis, required this.taktung});
 

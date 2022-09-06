@@ -1,4 +1,5 @@
 import 'package:fahrradverleih/api/rad_api.dart';
+import 'package:fahrradverleih/view/neue_ausleihe/neue_ausleihe_page.dart';
 import 'package:fahrradverleih/view/rad_auswahl/rad_auswahl_page.dart';
 import 'package:fahrradverleih/widget/error_panel.dart';
 import 'package:flutter/material.dart';
@@ -39,10 +40,22 @@ class _ContentView extends StatelessWidget {
 
   _handleNavigationEvent(BuildContext context, MapState state) async {
     if (state.status == MapStatus.radAuswahl && state.auswahlStation != null) {
+      // Zeige Rad-Auswahl Modal
       final bloc = context.read<MapBloc>();
       var rad = await Navigator.of(context)
           .push(RadAuswahlPage.route(state.auswahlStation!));
       bloc.add(RadSelected(rad));
+    } else if (state.status == MapStatus.buchung) {
+      // Zeige Neue-Ausleihe Modal
+      final bloc = context.read<MapBloc>();
+      var ausleihe = await Navigator.of(context)
+          .push(NeueAusleihePage.route(state.auswahlRad!));
+      bloc.add(BuchungAbgeschlossen(ausleihe));
+    } else if (state.status == MapStatus.buchungOk) {
+      // Zeige Erfolgsmeldung
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(const SnackBar(content: Text("Buchung erfolgreich!")));
     }
   }
 
@@ -54,6 +67,7 @@ class _ContentView extends StatelessWidget {
         return _getRetryPanel(context);
       case MapStatus.idle:
       case MapStatus.buchung:
+      case MapStatus.buchungOk:
       case MapStatus.radAuswahl:
         return _MapView();
     }

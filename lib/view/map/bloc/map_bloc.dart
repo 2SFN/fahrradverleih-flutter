@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:fahrradverleih/api/rad_api.dart';
+import 'package:fahrradverleih/model/ausleihe.dart';
 import 'package:fahrradverleih/model/fahrrad.dart';
 import 'package:fahrradverleih/model/station.dart';
 
@@ -40,8 +41,17 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     }
   }
 
-  _onBuchungAbgeschlossen(BuchungAbgeschlossen event, Emitter<MapState> emit) {
-    // TODO
+  _onBuchungAbgeschlossen(
+      BuchungAbgeschlossen event, Emitter<MapState> emit) async {
+    if (event.ausleihe != null) {
+      emit(state.copyWith(
+          status: MapStatus.buchungOk, auswahlRad: null, auswahlStation: null));
+      // Aktualisiere Liste von Stationen
+      await _fetchStationen(emit);
+    } else {
+      emit(state.copyWith(
+          status: MapStatus.idle, auswahlStation: null, auswahlRad: null));
+    }
   }
 
   _onRetryRequested(RetryRequested event, Emitter<MapState> emit) {
