@@ -5,6 +5,7 @@ import 'package:fahrradverleih/widget/error_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../model/station.dart';
 import 'bloc/map_bloc.dart';
@@ -33,35 +34,48 @@ class _ContentView extends StatelessWidget {
       ),
       listenWhen: (p, c) => p.status != c.status,
       listener: (p, c) {
-        _handleNavigationEvent(context, c);
+        _handleStatusChange(context, c);
       },
     );
   }
 
-  _handleNavigationEvent(BuildContext context, MapState state) async {
-    if (state.status == MapStatus.radAuswahl && state.auswahlStation != null) {
-      // Zeige Rad-Auswahl Modal
-      final bloc = context.read<MapBloc>();
-      var rad = await Navigator.of(context)
-          .push(RadAuswahlPage.route(state.auswahlStation!));
-      bloc.add(RadSelected(rad));
-    } else if (state.status == MapStatus.buchung) {
-      // Zeige Neue-Ausleihe Modal
-      final bloc = context.read<MapBloc>();
-      var ausleihe = await Navigator.of(context)
-          .push(NeueAusleihePage.route(state.auswahlRad!));
-      bloc.add(BuchungAbgeschlossen(ausleihe));
-    } else if (state.status == MapStatus.buchungOk) {
-      // Zeige Erfolgsmeldung
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(const SnackBar(content: Text("Buchung erfolgreich!")));
+  _handleStatusChange(BuildContext context, MapState state) async {
+    final bloc = context.read<MapBloc>();
+    switch(state.status) {
+      case MapStatus.fetching:
+      case MapStatus.failure:
+      case MapStatus.idle:
+        break;
+      case MapStatus.permissionsCheck:
+        // Prüfe Laufzeit-Berechtigungen (Location)
+        await Permission.locationWhenInUse.request();
+        bloc.add(const PermissionsCheckFinished());
+        break;
+      case MapStatus.radAuswahl:
+        // Zeige Rad-Auswahl Modal
+        var rad = await Navigator.of(context)
+            .push(RadAuswahlPage.route(state.auswahlStation!));
+        bloc.add(RadSelected(rad));
+        break;
+      case MapStatus.buchung:
+        // Zeige Neue-Ausleihe Modal
+        var ausleihe = await Navigator.of(context)
+            .push(NeueAusleihePage.route(state.auswahlRad!));
+        bloc.add(BuchungAbgeschlossen(ausleihe));
+        break;
+      case MapStatus.buchungOk:
+        // Zeige Erfolgsmeldung
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(const SnackBar(content: Text("Buchung erfolgreich!")));
+        break;
     }
   }
 
   _getWidget(BuildContext context, MapState state) {
     switch (state.status) {
       case MapStatus.fetching:
+      case MapStatus.permissionsCheck:
         return const Center(child: CircularProgressIndicator());
       case MapStatus.failure:
         return _getRetryPanel(context);
@@ -88,6 +102,8 @@ class _MapView extends StatelessWidget {
         minMaxZoomPreference: const MinMaxZoomPreference(10, 20),
         tiltGesturesEnabled: false,
         markers: _buildMarkers(context, state.stationen),
+        myLocationButtonEnabled: true,
+        myLocationEnabled: true,
       ),
     );
   }

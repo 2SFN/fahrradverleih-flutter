@@ -7,6 +7,10 @@ abstract class MapEvent extends Equatable {
   List<Object?> get props => [];
 }
 
+class PermissionsCheckFinished extends MapEvent {
+  const PermissionsCheckFinished();
+}
+
 class FirstConstructed extends MapEvent {
   const FirstConstructed();
 }

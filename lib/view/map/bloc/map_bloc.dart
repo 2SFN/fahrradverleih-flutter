@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:fahrradverleih/api/rad_api.dart';
@@ -14,6 +16,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       : _api = api,
         super(const MapState()) {
     on<FirstConstructed>(_onFirstConstructed);
+    on<PermissionsCheckFinished>(_onPermissionsCheckFinished);
     on<StationSelected>(_onStationSelected);
     on<RadSelected>(_onRadSelected);
     on<BuchungAbgeschlossen>(_onBuchungAbgeschlossen);
@@ -24,6 +27,12 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
   _onFirstConstructed(FirstConstructed event, Emitter<MapState> emit) async {
     await _fetchStationen(emit);
+    emit(state.copyWith(status: MapStatus.permissionsCheck));
+  }
+
+  _onPermissionsCheckFinished(
+      PermissionsCheckFinished event, Emitter<MapState> emit) {
+    emit(state.copyWith(status: MapStatus.idle));
   }
 
   _onStationSelected(StationSelected event, Emitter<MapState> emit) {
@@ -64,7 +73,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         status: MapStatus.fetching, stationen: const [], auswahlStation: null));
     try {
       var result = await _api.getStationen();
-      emit(state.copyWith(status: MapStatus.idle, stationen: result));
+      emit(state.copyWith(stationen: result));
     } catch (e) {
       emit(state.copyWith(status: MapStatus.failure));
     }

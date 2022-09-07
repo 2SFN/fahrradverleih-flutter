@@ -1,14 +1,21 @@
 part of 'map_bloc.dart';
 
-enum MapStatus { fetching, failure, idle, radAuswahl, buchung, buchungOk }
+enum MapStatus {
+  fetching,
+  permissionsCheck,
+  failure,
+  idle,
+  radAuswahl,
+  buchung,
+  buchungOk
+}
 
 class MapState extends Equatable {
-  const MapState({
-    this.status = MapStatus.fetching,
-    this.stationen = const [],
-    this.auswahlStation,
-    this.auswahlRad
-  });
+  const MapState(
+      {this.status = MapStatus.fetching,
+      this.stationen = const [],
+      this.auswahlStation,
+      this.auswahlRad});
 
   final MapStatus status;
   final List<Station> stationen;
