@@ -3,6 +3,7 @@ import 'package:fahrradverleih/view/neue_ausleihe/neue_ausleihe_page.dart';
 import 'package:fahrradverleih/view/rad_auswahl/rad_auswahl_page.dart';
 import 'package:fahrradverleih/widget/error_panel.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -97,6 +98,7 @@ class _MapView extends StatelessWidget {
     // TODO: Map-marker style and labels
     return BlocBuilder<MapBloc, MapState>(
       builder: (context, state) => GoogleMap(
+        onMapCreated: _onMapCreated,
         initialCameraPosition: const CameraPosition(
             target: LatLng(51.102129, 6.892598), zoom: 13.7),
         minMaxZoomPreference: const MinMaxZoomPreference(10, 20),
@@ -119,5 +121,10 @@ class _MapView extends StatelessWidget {
             context.read<MapBloc>().add(StationSelected(s));
           });
     }));
+  }
+
+  _onMapCreated(GoogleMapController controller) async {
+    var styles = await rootBundle.loadString("assets/map_style.json");
+    controller.setMapStyle(styles);
   }
 }
