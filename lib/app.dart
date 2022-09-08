@@ -39,6 +39,15 @@ class _AppViewState extends State<AppView> {
     return MaterialApp(
       navigatorKey: _navigatorKey,
       onGenerateRoute: (_) => StartupPage.route(),
+      title: "Fahrradverleih",
+      debugShowCheckedModeBanner: false,
+      themeMode: ThemeMode.light,
+      theme: ThemeData(
+        primaryColor: const Color(0xFF0297DC),
+        colorScheme: const ColorScheme.light(
+          primary: Color(0xFF0297DC),
+        ),
+      ),
     );
   }
 }

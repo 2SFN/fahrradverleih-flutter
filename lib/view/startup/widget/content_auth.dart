@@ -5,8 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Einfacher Splash-Screen mit einem Lade-Indikator.
 ///
-/// Registriert außerdem einen [BlocListener], um auf den Status
-/// [AuthenticationStatus.authenticated] zu hören und entsprechend zu der
+/// Registriert einen [BlocListener], um auf den Status
+/// [AuthenticationStatus.authenticated] zu warten und entsprechend zu der
 /// nächsten Ansicht zu navigieren.
 class ContentAuth extends StatelessWidget {
   const ContentAuth({Key? key}) : super(key: key);
