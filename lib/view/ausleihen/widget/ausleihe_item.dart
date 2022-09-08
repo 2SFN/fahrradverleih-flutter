@@ -1,4 +1,6 @@
 import 'package:fahrradverleih/model/ausleihe.dart';
+import 'package:fahrradverleih/util/button_styles.dart';
+import 'package:fahrradverleih/widget/rad_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -14,19 +16,29 @@ class AusleiheItem extends StatelessWidget {
     return Padding(
         padding: const EdgeInsets.all(8),
         child: Row(children: [
-          // TODO: Ersetzen durch Rad-Spezifisches Icon
-          Icon(Icons.pedal_bike,
-              size: 64, semanticLabel: ausleihe.fahrrad.typ.bezeichnung),
-          Column(children: [
-            Text(ausleihe.fahrrad.typ.bezeichnung),
-            Text(_tarifInfo()),
-            Text(_rueckgabeInfo()),
-            if (ausleihe.aktiv)
-              ElevatedButton(
-                onPressed: onRueckgabe,
-                child: const Text("Zurückgeben"),
-              )
-          ])
+          RadIcon(typ: ausleihe.fahrrad.typ, width: 92),
+          const Padding(padding: EdgeInsets.all(8)),
+          Expanded(
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(ausleihe.fahrrad.typ.bezeichnung, style: _primaryTextStyle),
+                  _spacing,
+                  Text(_tarifInfo(), style: _secondaryTextStyle),
+                  _spacing,
+                  Text("ID: ${ausleihe.fahrrad.id}", style: _secondaryTextStyle),
+                  _spacing,
+                  Text(_rueckgabeInfo(), style: _secondaryTextStyle),
+                  _spacing,
+                  if (ausleihe.aktiv)
+                    OutlinedButton(
+                      style: ButtonStyles.primaryButtonStyle(context),
+                      onPressed: onRueckgabe,
+                      child: const Text("Zurückgeben"),
+                    )
+                ]),
+          )
         ]));
   }
 
@@ -65,4 +77,16 @@ class AusleiheItem extends StatelessWidget {
   String _formatTime(DateTime date) {
     return DateFormat("H:mm", "de_DE").format(date);
   }
+
+  static const _spacing = Padding(padding: EdgeInsets.all(2));
+
+  static const _primaryTextStyle = TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w500
+  );
+
+  static const _secondaryTextStyle = TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w400
+  );
 }
