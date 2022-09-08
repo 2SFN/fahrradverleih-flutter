@@ -43,11 +43,13 @@ class _AppViewState extends State<AppView> {
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.light,
       theme: ThemeData(
-        primaryColor: const Color(0xFF0297DC),
-        colorScheme: const ColorScheme.light(
-          primary: Color(0xFF0297DC),
-        ),
-      ),
+          primaryColor: const Color(0xFF0297DC),
+          colorScheme: const ColorScheme.light(
+            primary: Color(0xFF0297DC),
+          ),
+          appBarTheme: const AppBarTheme(
+              titleTextStyle:
+                  TextStyle(fontWeight: FontWeight.w400, fontSize: 20))),
     );
   }
 }
