@@ -1,6 +1,7 @@
 import 'package:fahrradverleih/api/rad_api.dart';
 import 'package:fahrradverleih/model/ausleihe.dart';
 import 'package:fahrradverleih/model/station.dart';
+import 'package:fahrradverleih/util/button_styles.dart';
 import 'package:fahrradverleih/view/ausleihe_beenden/bloc/ausleihe_beenden_bloc.dart';
 import 'package:fahrradverleih/widget/error_panel.dart';
 import 'package:flutter/cupertino.dart';
@@ -71,9 +72,9 @@ class _AusleiheBeendenView extends StatelessWidget {
   }
 
   _getRetryPanel(BuildContext context) => ErrorPanel(
-    onRetry: () => context.read<AusleiheBeendenBloc>()
-        .add(const RetryRequested()),
-  );
+        onRetry: () =>
+            context.read<AusleiheBeendenBloc>().add(const RetryRequested()),
+      );
 }
 
 class _StationAuswahlPanel extends StatelessWidget {
@@ -82,22 +83,38 @@ class _StationAuswahlPanel extends StatelessWidget {
     return BlocBuilder<AusleiheBeendenBloc, AusleiheBeendenState>(
         builder: (context, state) {
       return Scaffold(
-        appBar: AppBar(),
-        body: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            Title(
-                color: Colors.black,
-                child: const Text("Rückgabestation auswählen")),
-            Text("Rad-ID: ${state.ausleihe!.fahrrad.id}"),
-            ..._buildRadioTiles(context, state)
-          ],
-        ),
-        persistentFooterButtons: [
-          _RueckgabeButton(),
-          _CancelButton(),
-        ],
-      );
+          appBar: AppBar(
+              elevation: 1,
+              automaticallyImplyLeading: false,
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.black,
+              titleTextStyle: const TextStyle(color: Colors.black),
+              title: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text("Rückgabestation auswählen",
+                      style: TextStyle(fontWeight: FontWeight.w500)),
+                  const Padding(padding: EdgeInsets.all(2)),
+                  Text("Rad-ID: ${state.ausleihe!.fahrrad.id}"),
+                ],
+              )),
+          body: ListView(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            children: [..._buildRadioTiles(context, state)],
+          ),
+          persistentFooterButtons: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _CancelButton(),
+                    const Padding(padding: EdgeInsets.all(3)),
+                    _RueckgabeButton(),
+                  ]),
+            ),
+          ]);
     });
   }
 
@@ -126,6 +143,7 @@ class _RueckgabeButton extends StatelessWidget {
     final bloc = context.read<AusleiheBeendenBloc>();
     return BlocBuilder<AusleiheBeendenBloc, AusleiheBeendenState>(
         builder: (context, state) => OutlinedButton(
+          style: ButtonStyles.primaryButtonStyle(context, compact: true),
             child: const Text("Rückgabe Bestätigen"),
             onPressed: () {
               bloc.add(const BeendenRequested());
@@ -139,7 +157,8 @@ class _CancelButton extends StatelessWidget {
     final bloc = context.read<AusleiheBeendenBloc>();
     return BlocBuilder<AusleiheBeendenBloc, AusleiheBeendenState>(
         builder: (context, state) => OutlinedButton(
-            child: const Text("Zurück"),
+          style: ButtonStyles.secondaryButtonStyle(context, compact: true),
+            child: const Text("Abbrechen"),
             onPressed: () {
               bloc.add(const AusleiheBeendenCancelled());
             }));
