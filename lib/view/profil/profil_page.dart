@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:fahrradverleih/api/rad_api.dart';
+import 'package:fahrradverleih/util/button_styles.dart';
 import 'package:fahrradverleih/view/profil/bloc/profil_bloc.dart';
 import 'package:fahrradverleih/view/startup/startup_page.dart';
 import 'package:fahrradverleih/widget/error_panel.dart';
@@ -163,7 +164,7 @@ class _PasswortButton extends StatelessWidget {
                 size: 28,
                 color: _FormFieldBase.accentColor),
             child: OutlinedButton(
-              style: _primaryButtonStyle(context),
+              style: ButtonStyles.primaryButtonStyle(context, compact: true),
               onPressed: state.jobState == JobState.idle ? () {} : null,
               child: const Text("Anmeldung Ändern"),
             )));
@@ -193,7 +194,7 @@ class _AbmeldenButton extends StatelessWidget {
     return BlocBuilder<ProfilBloc, ProfilState>(
       buildWhen: (previous, current) => previous.jobState != current.jobState,
       builder: (context, state) => OutlinedButton(
-          style: _dangerButtonStyle(context),
+          style: ButtonStyles.dangerButtonStyle(context, compact: true),
           onPressed: state.jobState != JobState.idle
               ? null
               : () {
@@ -210,7 +211,7 @@ class _AnwendenButton extends StatelessWidget {
     return BlocBuilder<ProfilBloc, ProfilState>(
       buildWhen: (previous, current) => previous.jobState != current.jobState,
       builder: (context, state) => OutlinedButton(
-          style: _primaryButtonStyle(context),
+          style: ButtonStyles.primaryButtonStyle(context, compact: true),
           onPressed: state.jobState != JobState.idle
               ? null
               : () {
@@ -306,34 +307,4 @@ class _FormTextField extends StatelessWidget {
           ],
         ));
   }
-}
-
-ButtonStyle _primaryButtonStyle(BuildContext context) {
-  final color = Theme.of(context).primaryColor;
-  final borderSide = BorderSide(color: color, width: 1);
-  return OutlinedButton.styleFrom(
-      // Verhindert ungewolltes, äußeres margin
-      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      // Lässt den Button schmaler erscheinen
-      minimumSize: const Size(200, 20),
-      textStyle: const TextStyle(fontWeight: FontWeight.w400),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      side: borderSide,
-      shape: RoundedRectangleBorder(
-          side: borderSide, borderRadius: BorderRadius.zero),
-      foregroundColor: color);
-}
-
-ButtonStyle _dangerButtonStyle(BuildContext context) {
-  const color = Color(0xFFEB445A);
-  const borderSide = BorderSide(color: color, width: 1);
-  return OutlinedButton.styleFrom(
-      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      minimumSize: const Size(200, 20),
-      textStyle: const TextStyle(fontWeight: FontWeight.w400),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      side: borderSide,
-      shape: const RoundedRectangleBorder(
-          side: borderSide, borderRadius: BorderRadius.zero),
-      foregroundColor: color);
 }
