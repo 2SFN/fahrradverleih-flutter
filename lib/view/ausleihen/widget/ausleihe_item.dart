@@ -1,6 +1,6 @@
 import 'package:fahrradverleih/model/ausleihe.dart';
 import 'package:fahrradverleih/util/button_styles.dart';
-import 'package:fahrradverleih/widget/rad_icon.dart';
+import 'package:fahrradverleih/widget/rad_item_base.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -13,33 +13,20 @@ class AusleiheItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-        padding: const EdgeInsets.all(8),
-        child: Row(children: [
-          RadIcon(typ: ausleihe.fahrrad.typ, width: 92),
-          const Padding(padding: EdgeInsets.all(8)),
-          Expanded(
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(ausleihe.fahrrad.typ.bezeichnung, style: _primaryTextStyle),
-                  _spacing,
-                  Text(_tarifInfo(), style: _secondaryTextStyle),
-                  _spacing,
-                  Text("ID: ${ausleihe.fahrrad.id}", style: _secondaryTextStyle),
-                  _spacing,
-                  Text(_rueckgabeInfo(), style: _secondaryTextStyle),
-                  _spacing,
-                  if (ausleihe.aktiv)
-                    OutlinedButton(
-                      style: ButtonStyles.primaryButtonStyle(context),
-                      onPressed: onRueckgabe,
-                      child: const Text("Zurückgeben"),
-                    )
-                ]),
-          )
-        ]));
+    return RadItemBase(typ: ausleihe.fahrrad.typ, extensions: [
+      Text(_tarifInfo(), style: RadItemBase.secondaryTextStyle),
+      RadItemBase.spacing,
+      Text("ID: ${ausleihe.fahrrad.id}", style: RadItemBase.secondaryTextStyle),
+      RadItemBase.spacing,
+      Text(_rueckgabeInfo(), style: RadItemBase.secondaryTextStyle),
+      RadItemBase.spacing,
+      if (ausleihe.aktiv)
+        OutlinedButton(
+          style: ButtonStyles.primaryButtonStyle(context),
+          onPressed: onRueckgabe,
+          child: const Text("Zurückgeben"),
+        )
+    ]);
   }
 
   /// Rückgabe (bspw.):  Tarif: 6€ für 12 Stunden
@@ -77,16 +64,4 @@ class AusleiheItem extends StatelessWidget {
   String _formatTime(DateTime date) {
     return DateFormat("H:mm", "de_DE").format(date);
   }
-
-  static const _spacing = Padding(padding: EdgeInsets.all(2));
-
-  static const _primaryTextStyle = TextStyle(
-    fontSize: 14,
-    fontWeight: FontWeight.w500
-  );
-
-  static const _secondaryTextStyle = TextStyle(
-    fontSize: 14,
-    fontWeight: FontWeight.w400
-  );
 }
