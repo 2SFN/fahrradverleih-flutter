@@ -1,7 +1,9 @@
 import 'package:fahrradverleih/api/rad_api.dart';
 import 'package:fahrradverleih/model/ausleihe.dart';
 import 'package:fahrradverleih/model/fahrrad.dart';
+import 'package:fahrradverleih/model/station.dart';
 import 'package:fahrradverleih/model/tarif.dart';
+import 'package:fahrradverleih/util/button_styles.dart';
 import 'package:fahrradverleih/view/neue_ausleihe/bloc/neue_ausleihe_bloc.dart';
 import 'package:fahrradverleih/widget/rad_item_base.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,25 +11,37 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
+class NeueAusleiheArguments {
+  const NeueAusleiheArguments({
+    required this.station,
+    required this.rad,
+  });
+
+  final Station station;
+  final Fahrrad rad;
+}
+
 class NeueAusleihePage extends StatelessWidget {
   const NeueAusleihePage({Key? key}) : super(key: key);
 
   static const routeName = "/ausleihen/neu";
 
-  static Route<Ausleihe?> route(Fahrrad rad) => CupertinoModalPopupRoute(
-      builder: (_) => const NeueAusleihePage(),
-      barrierDismissible: false,
-      settings: RouteSettings(name: routeName, arguments: rad));
+  static Route<Ausleihe?> route(NeueAusleiheArguments arguments) =>
+      CupertinoModalPopupRoute(
+          builder: (_) => const NeueAusleihePage(),
+          barrierDismissible: false,
+          settings: RouteSettings(name: routeName, arguments: arguments));
 
   @override
   Widget build(BuildContext context) {
     // Argument Auslesen
-    final rad = ModalRoute.of(context)!.settings.arguments as Fahrrad;
+    final args =
+        ModalRoute.of(context)!.settings.arguments as NeueAusleiheArguments;
 
     return BlocProvider<NeueAusleiheBloc>(
       create: (context) =>
           NeueAusleiheBloc(api: RepositoryProvider.of<RadApi>(context))
-            ..add(FirstConstructed(rad)),
+            ..add(FirstConstructed(rad: args.rad, station: args.station)),
       child: _NeueAusleiheView(),
     );
   }
@@ -39,15 +53,48 @@ class _NeueAusleiheView extends StatelessWidget {
     return BlocConsumer<NeueAusleiheBloc, NeueAusleiheState>(
         buildWhen: (p, c) => p.rad != c.rad,
         builder: (context, state) => Scaffold(
-              appBar: AppBar(title: const Text("Rad Buchen")),
+              appBar: _buildAppBar(state),
               body: Column(children: [
                 _InfoRadItem(rad: state.rad),
+                const Divider(),
                 const _ZeitAuswahlPanel()
               ]),
-              persistentFooterButtons: const [_SubmitButton(), _CancelButton()],
+              persistentFooterButtons: [_buildFooter()],
             ),
         listenWhen: (p, c) => p.status != c.status,
         listener: (p, c) => _handleSateChanges(context, c));
+  }
+
+  AppBar _buildAppBar(NeueAusleiheState state) {
+    return AppBar(
+      titleTextStyle: const TextStyle(color: Colors.white),
+      title: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(state.station.bezeichnung,
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.w300)),
+            const Padding(padding: EdgeInsets.all(2)),
+            const Text("Fahrrad buchen",
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400))
+          ]),
+      automaticallyImplyLeading: false,
+      titleSpacing: 4,
+      leading: const Icon(Icons.location_on, color: Colors.white, size: 38),
+    );
+  }
+
+  Column _buildFooter() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: const [
+        _SubmitButton(),
+        Padding(padding: EdgeInsets.all(2)),
+        _CancelButton()
+      ],
+    );
   }
 
   _handleSateChanges(BuildContext context, NeueAusleiheState state) {
@@ -76,21 +123,43 @@ class _ZeitAuswahlPanel extends StatelessWidget {
             alignment: Alignment.center,
             padding: const EdgeInsets.all(24),
             child: Column(children: [
-              const Text("Rad ausleihen für"),
-              Row(children: [Text(state.dauer.toString()), const Text("h")]),
-              Text(_infoText(state)),
-              Row(children: [
-                OutlinedButton(
-                    onPressed: () => context
-                        .read<NeueAusleiheBloc>()
-                        .add(const MinusClicked()),
-                    child: const Text("-")),
-                OutlinedButton(
-                    onPressed: () => context
-                        .read<NeueAusleiheBloc>()
-                        .add(const PlusClicked()),
-                    child: const Text("+"))
-              ])
+              const Text("Rad ausleihen für", style: _textInfo),
+              const Padding(padding: EdgeInsets.all(10)),
+              // Zeit-Anzeige
+              Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(state.dauer.toString(), style: _textTimePrimary),
+                    const Padding(padding: EdgeInsets.all(8)),
+                    const Text("h", style: _textTimeSecondary)
+                  ]),
+              const Padding(padding: EdgeInsets.all(10)),
+              Text(_infoText(state), style: _textInfo),
+              const Padding(padding: EdgeInsets.all(10)),
+              // Plus/Minus Buttons
+              Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                          style: ButtonStyles.primaryButtonStyle(context),
+                          onPressed: () => context
+                              .read<NeueAusleiheBloc>()
+                              .add(const MinusClicked()),
+                          child: const Text("−")),
+                    ),
+                    const Padding(padding: EdgeInsets.all(8)),
+                    Expanded(
+                      child: OutlinedButton(
+                          style: ButtonStyles.primaryButtonStyle(context),
+                          onPressed: () => context
+                              .read<NeueAusleiheBloc>()
+                              .add(const PlusClicked()),
+                          child: const Text("+")),
+                    )
+                  ])
             ]));
       },
     );
@@ -98,12 +167,21 @@ class _ZeitAuswahlPanel extends StatelessWidget {
 
   String _infoText(NeueAusleiheState state) {
     final preis = ((state.dauer / state.rad.typ.tarif.taktung) *
-        state.rad.typ.tarif.preis.betrag).toInt();
+            state.rad.typ.tarif.preis.betrag)
+        .toInt();
     final zeit = DateFormat("H:mm")
         .format(DateTime.now().add(Duration(hours: state.dauer)));
     return "Gesamtpreis ${state.rad.typ.tarif.preis.iso4217} $preis\n"
         "Rückgabe bis $zeit Uhr";
   }
+
+  static const _textInfo = TextStyle(fontSize: 14, fontWeight: FontWeight.w300);
+
+  static const _textTimePrimary =
+      TextStyle(fontSize: 36, fontWeight: FontWeight.w600);
+
+  static const _textTimeSecondary =
+      TextStyle(fontSize: 36, fontWeight: FontWeight.w300, color: Colors.grey);
 }
 
 class _InfoRadItem extends StatelessWidget {
@@ -117,8 +195,13 @@ class _InfoRadItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RadItemBase(
+      padding: const EdgeInsets.all(16),
       typ: rad.typ,
-      extensions: [Text(_tarifInfo(rad.typ.tarif)), Text("ID: ${rad.id}")],
+      extensions: [
+        Text(_tarifInfo(rad.typ.tarif), style: RadItemBase.secondaryTextStyle),
+        RadItemBase.spacing,
+        Text("ID: ${rad.id}", style: RadItemBase.secondaryTextStyle)
+      ],
     );
   }
 
@@ -140,6 +223,7 @@ class _SubmitButton extends StatelessWidget {
           return const CircularProgressIndicator();
         } else {
           return OutlinedButton(
+              style: ButtonStyles.primaryButtonStyle(context, compact: true),
               onPressed: () =>
                   context.read<NeueAusleiheBloc>().add(const BuchenClicked()),
               child: const Text("Buchung Bestätigen"));
@@ -157,6 +241,7 @@ class _CancelButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(
+        style: ButtonStyles.secondaryButtonStyle(context, compact: true),
         onPressed: () =>
             context.read<NeueAusleiheBloc>().add(const CancelClicked()),
         child: const Text("Zurück"));

@@ -42,7 +42,7 @@ class _ContentView extends StatelessWidget {
 
   _handleStatusChange(BuildContext context, MapState state) async {
     final bloc = context.read<MapBloc>();
-    switch(state.status) {
+    switch (state.status) {
       case MapStatus.fetching:
       case MapStatus.failure:
       case MapStatus.idle:
@@ -60,8 +60,9 @@ class _ContentView extends StatelessWidget {
         break;
       case MapStatus.buchung:
         // Zeige Neue-Ausleihe Modal
-        var ausleihe = await Navigator.of(context)
-            .push(NeueAusleihePage.route(state.auswahlRad!));
+        var ausleihe = await Navigator.of(context).push(NeueAusleihePage.route(
+            NeueAusleiheArguments(
+                station: state.auswahlStation!, rad: state.auswahlRad!)));
         bloc.add(BuchungAbgeschlossen(ausleihe));
         break;
       case MapStatus.buchungOk:

@@ -8,9 +8,10 @@ abstract class NeueAusleiheEvent extends Equatable {
 }
 
 class FirstConstructed extends NeueAusleiheEvent {
-  const FirstConstructed(this.rad);
+  const FirstConstructed({required this.rad, required this.station});
 
   final Fahrrad rad;
+  final Station station;
 
   @override
   List<Object?> get props => [rad];

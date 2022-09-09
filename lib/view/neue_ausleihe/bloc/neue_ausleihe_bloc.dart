@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:fahrradverleih/api/rad_api.dart';
 import 'package:fahrradverleih/model/ausleihe.dart';
 import 'package:fahrradverleih/model/fahrrad.dart';
+import 'package:fahrradverleih/model/station.dart';
 
 part 'neue_ausleihe_event.dart';
 part 'neue_ausleihe_state.dart';
@@ -25,6 +26,7 @@ class NeueAusleiheBloc extends Bloc<NeueAusleiheEvent, NeueAusleiheState> {
     // standardmäßig auf die kleinste Einheit der Taktung
     emit(state.copyWith(
         status: NeueAusleiheStatus.idle,
+        station: event.station,
         rad: event.rad,
         dauer: event.rad.typ.tarif.taktung));
   }
