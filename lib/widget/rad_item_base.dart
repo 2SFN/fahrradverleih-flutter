@@ -23,8 +23,8 @@ class RadItemBase extends StatelessWidget {
     return Padding(
         padding: padding,
         child: Row(children: [
-          RadIcon(typ: typ, width: 92),
-          const Padding(padding: EdgeInsets.all(8)),
+          RadIcon(typ: typ, width: 118),
+          const Padding(padding: EdgeInsets.all(12)),
           Expanded(
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -38,11 +38,11 @@ class RadItemBase extends StatelessWidget {
         ]));
   }
 
-  static const spacing = Padding(padding: EdgeInsets.all(2));
+  static const spacing = Padding(padding: EdgeInsets.all(3));
 
   static const primaryTextStyle =
       TextStyle(fontSize: 14, fontWeight: FontWeight.w500);
 
   static const secondaryTextStyle =
-      TextStyle(fontSize: 14, fontWeight: FontWeight.w400);
+      TextStyle(fontSize: 14, fontWeight: FontWeight.w300);
 }

@@ -135,7 +135,8 @@ class _ZeitAuswahlPanel extends StatelessWidget {
                     const Text("h", style: _textTimeSecondary)
                   ]),
               const Padding(padding: EdgeInsets.all(10)),
-              Text(_infoText(state), style: _textInfo),
+              Text(_infoText(state),
+                  style: _textInfo, textAlign: TextAlign.center),
               const Padding(padding: EdgeInsets.all(10)),
               // Plus/Minus Buttons
               Row(

@@ -250,7 +250,7 @@ class _FormFieldBase extends StatelessWidget {
             ]));
   }
 
-  static const accentColor = Color(0xFF5e5e5e);
+  static const accentColor = Color(0xff939393);
 }
 
 class _FormTextField extends StatelessWidget {
