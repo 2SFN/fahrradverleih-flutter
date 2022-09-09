@@ -10,16 +10,18 @@ class RadItemBase extends StatelessWidget {
   const RadItemBase({
     Key? key,
     required this.typ,
+    this.padding = const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
     this.extensions = const [],
   }) : super(key: key);
 
   final FahrradTyp typ;
+  final EdgeInsetsGeometry padding;
   final List<Widget> extensions;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: const EdgeInsets.all(8),
+        padding: padding,
         child: Row(children: [
           RadIcon(typ: typ, width: 92),
           const Padding(padding: EdgeInsets.all(8)),

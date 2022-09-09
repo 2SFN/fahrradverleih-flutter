@@ -2,6 +2,7 @@ import 'package:fahrradverleih/api/rad_api.dart';
 import 'package:fahrradverleih/model/fahrrad.dart';
 import 'package:fahrradverleih/model/station.dart';
 import 'package:fahrradverleih/model/tarif.dart';
+import 'package:fahrradverleih/util/button_styles.dart';
 import 'package:fahrradverleih/view/ausleihe_beenden/ausleihe_beenden_page.dart';
 import 'package:fahrradverleih/view/rad_auswahl/bloc/rad_auswahl_bloc.dart';
 import 'package:fahrradverleih/view/rad_auswahl/model/rad_kategorie.dart';
@@ -47,35 +48,66 @@ class _ContentView extends StatelessWidget {
     return BlocConsumer<RadAuswahlBloc, RadAuswahlState>(
         buildWhen: (p, c) => p.status != c.status,
         builder: (context, state) => Scaffold(
-              appBar: AppBar(title: Text(_getAppBarTitle(state.status))),
+              appBar: _buildAppBar(state),
               body: _getWidget(context, state),
-              persistentFooterButtons: [
-                OutlinedButton(
-                    onPressed: () => context
-                        .read<RadAuswahlBloc>()
-                        .add(const CancelClicked()),
-                    child: const Text("Zurück"))
-              ],
+              persistentFooterButtons: [_buildFooter(context)],
             ),
         listenWhen: (p, c) => p.status != c.status,
         listener: (p, c) => _handleNavEvents(context, c));
   }
 
+  AppBar _buildAppBar(RadAuswahlState state) {
+    return AppBar(
+      titleTextStyle: const TextStyle(color: Colors.white),
+      title: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(state.station.bezeichnung,
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.w300)),
+            const Padding(padding: EdgeInsets.all(2)),
+            Text(_getAppBarTitle(state.status),
+                style:
+                    const TextStyle(fontSize: 12, fontWeight: FontWeight.w400))
+          ]),
+      automaticallyImplyLeading: false,
+      titleSpacing: 4,
+      leading: const Icon(Icons.location_on, color: Colors.white, size: 38),
+    );
+  }
+
+  Column _buildFooter(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        OutlinedButton(
+            style: ButtonStyles.secondaryButtonStyle(context),
+            onPressed: () =>
+                context.read<RadAuswahlBloc>().add(const CancelClicked()),
+            child: const Text("Zurück")),
+      ],
+    );
+  }
+
+  /// Führt einmalige Aktionen bei Änderung des [RadAuswahlStatus] aus.
   _handleNavEvents(BuildContext context, RadAuswahlState state) {
-    if(state.status == RadAuswahlStatus.cancelled) {
+    if (state.status == RadAuswahlStatus.cancelled) {
       Navigator.pop(context, null);
-    } else if(state.status == RadAuswahlStatus.done) {
+    } else if (state.status == RadAuswahlStatus.done) {
       Navigator.pop(context, state.auswahlRad);
     }
   }
 
+  /// Entscheidet basieren auf dem [RadAuswahlStatus] das anzuzeigende Widget.
   Widget _getWidget(BuildContext context, RadAuswahlState state) {
     switch (state.status) {
       case RadAuswahlStatus.fetching:
       case RadAuswahlStatus.cancelled:
         return const Center(child: CircularProgressIndicator());
       case RadAuswahlStatus.failed:
-        return _getRetryPanel(context);
+        return _buildRetryPanel(context);
       case RadAuswahlStatus.done:
       case RadAuswahlStatus.auswahlRad:
         return _RadAuswahlPanel();
@@ -86,11 +118,11 @@ class _ContentView extends StatelessWidget {
 
   String _getAppBarTitle(RadAuswahlStatus status) {
     return (status == RadAuswahlStatus.auswahlTyp)
-        ? "Radtypen auswählen"
+        ? "Radtyp auswählen"
         : "Fahrrad auswählen";
   }
 
-  Widget _getRetryPanel(BuildContext context) {
+  Widget _buildRetryPanel(BuildContext context) {
     return ErrorPanel(onRetry: () {
       context.read<RadAuswahlBloc>().add(const RetryRequested());
     });
@@ -121,8 +153,11 @@ class _TypAuswahlPanel extends StatelessWidget {
     return RadItemBase(
       typ: kategorie.typ,
       extensions: [
-        Text("Verfügbar: ${kategorie.verfuegbar}"),
+        Text("Verfügbar: ${kategorie.verfuegbar}",
+            style: RadItemBase.secondaryTextStyle),
+        RadItemBase.spacing,
         OutlinedButton(
+            style: ButtonStyles.primaryButtonStyle(context, compact: true),
             onPressed: () {
               context.read<RadAuswahlBloc>().add(TypSelected(kategorie.typ));
             },
@@ -157,12 +192,19 @@ class _RadAuswahlPanel extends StatelessWidget {
       typ: rad.typ,
       extensions: [
         Text(_tarifInfo(rad.typ.tarif)),
-        Text("ID: ${rad.id}"),
-        OutlinedButton(onPressed: () {}, child: const Text("Reservieren")),
+        RadItemBase.spacing,
+        Text("ID: ${rad.id}", style: RadItemBase.secondaryTextStyle),
+        RadItemBase.spacing,
+        OutlinedButton(
+            onPressed: null,
+            style: ButtonStyles.primaryButtonStyle(context, compact: true),
+            child: const Text("Reservieren")),
+        RadItemBase.spacing,
         OutlinedButton(
             onPressed: () {
               context.read<RadAuswahlBloc>().add(RadSelected(rad));
             },
+            style: ButtonStyles.primaryButtonStyle(context, compact: true),
             child: const Text("Jetzt Buchen")),
       ],
     );

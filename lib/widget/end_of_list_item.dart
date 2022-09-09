@@ -10,8 +10,11 @@ class EndOfListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(child: Padding(
-      padding: const EdgeInsets.all(20),
-      child: Text(text)
+      padding: const EdgeInsets.all(22),
+      child: Text(text, style: const TextStyle(
+        fontWeight: FontWeight.w300,
+        color: Colors.grey
+      ))
     ));
   }
 }
