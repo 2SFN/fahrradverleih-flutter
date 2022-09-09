@@ -1,4 +1,5 @@
 import 'package:fahrradverleih/api/rad_api.dart';
+import 'package:fahrradverleih/util/marker_util.dart';
 import 'package:fahrradverleih/view/neue_ausleihe/neue_ausleihe_page.dart';
 import 'package:fahrradverleih/view/rad_auswahl/rad_auswahl_page.dart';
 import 'package:fahrradverleih/widget/error_panel.dart';
@@ -96,32 +97,46 @@ class _ContentView extends StatelessWidget {
 class _MapView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // TODO: Map-marker style and labels
     return BlocBuilder<MapBloc, MapState>(
-      builder: (context, state) => GoogleMap(
-        onMapCreated: _onMapCreated,
-        initialCameraPosition: const CameraPosition(
-            target: LatLng(51.102129, 6.892598), zoom: 13.7),
-        minMaxZoomPreference: const MinMaxZoomPreference(10, 20),
-        tiltGesturesEnabled: false,
-        markers: _buildMarkers(context, state.stationen),
-        myLocationButtonEnabled: true,
-        myLocationEnabled: true,
-      ),
+      builder: (context, state) {
+        // Aktualisiert die Ansicht, sobald das Future den Status/die Daten
+        // ändert. Bis Daten vorliegen wird [initialData] eingesetzt.
+        return FutureBuilder(
+            future: _buildMarkers(context, state.stationen),
+            initialData: const <Marker>{},
+            builder: (BuildContext context,
+                    AsyncSnapshot<Set<Marker>> markersFuture) =>
+                GoogleMap(
+                  onMapCreated: _onMapCreated,
+                  initialCameraPosition: const CameraPosition(
+                      target: LatLng(51.102129, 6.892598), zoom: 13.7),
+                  minMaxZoomPreference: const MinMaxZoomPreference(10, 20),
+                  tiltGesturesEnabled: false,
+                  markers:
+                      markersFuture.hasData ? markersFuture.data! : const {},
+                  myLocationButtonEnabled: true,
+                  myLocationEnabled: true,
+                ));
+      },
     );
   }
 
-  Set<Marker> _buildMarkers(BuildContext context, List<Station> stationen) {
-    return Set.from(List.generate(stationen.length, (index) {
-      var s = stationen[index];
-      return Marker(
+  Future<Set<Marker>> _buildMarkers(
+      BuildContext context, List<Station> stationen) async {
+    Set<Marker> markers = {};
+    for (var s in stationen) {
+      var icon =
+          await MarkerUtil.paintMarker(context, count: s.verfuegbar.toString());
+      markers.add(Marker(
+          icon: icon,
           markerId: MarkerId(s.id),
           position: LatLng(s.position.breite, s.position.laenge),
           consumeTapEvents: true,
           onTap: () {
             context.read<MapBloc>().add(StationSelected(s));
-          });
-    }));
+          }));
+    }
+    return Future.value(markers);
   }
 
   _onMapCreated(GoogleMapController controller) async {
